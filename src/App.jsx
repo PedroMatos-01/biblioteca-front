@@ -1,15 +1,13 @@
-import Livros from "./pages/Livros";
-import "./styles/App.css"
-import Header from './components/Header'
+import Login from "./pages/Login";
+import Catalogo from "./pages/Catalogo";
 
 function App() {
   return (
-    <div>
-      <Header />
-      <Livros />
-    </div>
-  )
-
-};
+    <>
+      <Login />
+      <Catalogo />
+    </>
+  );
+}
 
 export default App;
