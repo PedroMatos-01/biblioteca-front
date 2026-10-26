@@ -5,6 +5,7 @@ import RotaProtegida from "./components/RotaProtegida";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Catalogo from "./pages/Catalogo";
+import Cadastro from "./pages/Cadastro";
 
 function App() {
   const [token, setToken] = useState(localStorage.getItem("token"));
@@ -22,6 +23,7 @@ function App() {
   return (
     <Routes>
       <Route element={<Layout logado={!!token} onSair={handleSair} />}>
+        <Route path="/cadastro" element={<Cadastro />} />
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login onLogin={handleLogin} />} />
 

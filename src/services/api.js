@@ -39,3 +39,25 @@ export async function login(nome,email, senha) {
 
   return data;
 }
+export async function cadastrar(nome, email, senha) {
+  let response;
+  try {
+    response = await fetch(`${API_URL}/usuarios`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ nome, email, senha }),
+    });
+  } catch {
+    throw new Error("Não foi possível conectar ao servidor.");
+  }
+
+  const data = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    throw new Error(
+      data.erro || data.message || "Não foi possível realizar o cadastro."
+    );
+  }
+
+  return data;
+}

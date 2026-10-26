@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { getLivros } from "../services/api";
 import LivroCard from "../components/LivroCard";
+import styles from "./Catalogo.module.css";
+
 
 
 function Catalogo() {
@@ -28,10 +30,10 @@ function Catalogo() {
   return (
     <section>
       <h1>Catálogo</h1>
-        <ul>
-        {livros.map((livro) => (
+        <ul className={styles.lista}>
+          {livros.map((livro) => (
             <LivroCard key={livro.id} livro={livro} />
-        ))}
+          ))}
         </ul>
     </section>
   );

@@ -9,7 +9,7 @@ function Layout({ logado, onSair }) {
       <main className={styles.conteudo}>
         <Outlet />
       </main>
-      <footer className={styles.footer}>Biblioteca © 2026</footer>
+      <footer className={styles.footer}>Biblioteca Pedroca (:  2026</footer>
     </div>
   );
 }
