@@ -1,7 +1,26 @@
-function Header() {
+import { NavLink, useNavigate } from "react-router-dom";
+
+function Header({ logado, onSair }) {
+  const navigate = useNavigate();
+
+  function handleSair() {
+    onSair();
+    navigate("/login");
+  }
+
   return (
     <header>
-      <h1>Biblioteca</h1>
+      <nav>
+        <NavLink to="/">Início</NavLink>
+        {logado ? (
+          <>
+            <NavLink to="/livros">Livros</NavLink>
+            <button type="button" onClick={handleSair}>Sair</button>
+          </>
+        ) : (
+          <NavLink to="/login">Entrar</NavLink>
+        )}
+      </nav>
     </header>
   );
 }

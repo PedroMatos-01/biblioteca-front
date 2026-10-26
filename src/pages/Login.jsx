@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { login } from "../services/api";
+import { useNavigate } from "react-router-dom";
 
-function Login() {
+function Login({ onLogin }) {
+  const navigate = useNavigate();
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
@@ -28,6 +30,9 @@ function Login() {
       setNome("");
       setEmail("");
       setSenha("");
+      onLogin(data.token);
+      navigate("/livros");
+
     } catch (err) {
       setErro(err.message);
     } finally {
