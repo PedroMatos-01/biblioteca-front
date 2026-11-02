@@ -13,7 +13,7 @@ function Login({ onLogin }) {
   const location = useLocation();
   const mensagem = location.state?.mensagem;
 
-  async function handleSubmit(e) {
+async function handleSubmit(e) {
     e.preventDefault();
     setErro("");
 
@@ -25,6 +25,10 @@ function Login({ onLogin }) {
     setCarregando(true);
     try {
       const data = await login(nome, email, senha);
+      
+
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("perfil", data.perfil || data.usuario?.perfil);
       onLogin(data.token);
       navigate("/livros");
     } catch (err) {
