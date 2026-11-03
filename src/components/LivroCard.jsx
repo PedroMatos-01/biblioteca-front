@@ -1,8 +1,10 @@
+import styles from "./LivroCard.module.css";
+
 function LivroCard({ livro }) {
   return (
-    <li>
-      <h3>{livro.titulo}</h3>
-      <p>{livro.autor}</p>
+    <li className={styles.card}>
+      <h3 className={styles.titulo}>{livro.titulo}</h3>
+      <p className={styles.autor}>{livro.autor}</p>
     </li>
   );
 }
