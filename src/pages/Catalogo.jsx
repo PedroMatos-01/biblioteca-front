@@ -2,9 +2,11 @@ import { useEffect, useState } from "react";
 import {
   getLivros,
   criarLivro,
+  criarLivroPorIsbn,
   editarLivro,
   apagarLivro,
 } from "../services/api";
+import { ehAdmin } from "../services/auth";
 import LivroCard from "../components/LivroCard";
 import LivroForm from "../components/LivroForm";
 import styles from "./Catalogo.module.css";
@@ -12,17 +14,16 @@ import styles from "./Catalogo.module.css";
 function Catalogo() {
   const [livros, setLivros] = useState([]);
   const [erro, setErro] = useState("");
+  const [erroAcao, setErroAcao] = useState("");
   const [carregando, setCarregando] = useState(true);
   const [exibirForm, setExibirForm] = useState(false);
   const [livroEmEdicao, setLivroEmEdicao] = useState(null);
+  const [versao, setVersao] = useState(0);
+
+  const isAdmin = ehAdmin();
 
 
-const isAdmin = localStorage.getItem("perfil") === "administrador";
-
-  useEffect(() => {
-    carregar();
-  }, []);
-
+useEffect(() => {
   async function carregar() {
     try {
       const data = await getLivros();
@@ -33,36 +34,51 @@ const isAdmin = localStorage.getItem("perfil") === "administrador";
       setCarregando(false);
     }
   }
+  carregar();
+}, [versao]);
 
-  const handleSalvar = async (dadosLivro) => {
-    try {
-      if (livroEmEdicao) {
-        await editarLivro(livroEmEdicao.id, dadosLivro);
-      } else {
-        await criarLivro(dadosLivro);
-      }
+  function recarregar() {
+    setVersao((v) => v + 1);
+  }
+
+    function fecharForm() {
       setExibirForm(false);
       setLivroEmEdicao(null);
-      carregar();
-    } catch (err) {
-      alert(err.message);
     }
-  };
 
-  const handleApagar = async (id) => {
-    if (!window.confirm("Tem certeza que deseja apagar?")) return;
+
+  async function executar(acao, fecharAoFinal = false) {
+    setErroAcao("");
     try {
-      await apagarLivro(id);
-      carregar();
+      await acao();
+      if (fecharAoFinal) fecharForm();
+      recarregar();
     } catch (err) {
-      alert(err.message);
+      setErroAcao(err.message);
     }
-  };
+  }
 
-  const abrirEdicao = (livro) => {
+  function handleSalvar(dados) {
+    return executar(
+      () =>
+        livroEmEdicao ? editarLivro(livroEmEdicao.id, dados) : criarLivro(dados),
+      true
+    );
+  }
+
+  function handleSalvarPorIsbn(isbn) {
+    return executar(() => criarLivroPorIsbn(isbn), true);
+  }
+
+  function handleApagar(id) {
+    if (!window.confirm("Tem certeza que deseja apagar este livro?")) return;
+    return executar(() => apagarLivro(id));
+  }
+
+  function abrirEdicao(livro) {
     setLivroEmEdicao(livro);
     setExibirForm(true);
-  };
+  }
 
   if (carregando) return <p>Carregando livros...</p>;
   if (erro) return <p role="alert">{erro}</p>;
@@ -71,18 +87,21 @@ const isAdmin = localStorage.getItem("perfil") === "administrador";
     <section>
       <h1>Catálogo</h1>
 
+      {erroAcao && <p role="alert">{erroAcao}</p>}
+
       {isAdmin && !exibirForm && (
-        <button onClick={() => setExibirForm(true)}>+ Adicionar Livro</button>
+        <button type="button" onClick={() => setExibirForm(true)}>
+          + Adicionar livro
+        </button>
       )}
 
       {exibirForm && (
         <LivroForm
+          key={livroEmEdicao?.id ?? "novo"}
           livroAtual={livroEmEdicao}
           onSalvar={handleSalvar}
-          onCancelar={() => {
-            setExibirForm(false);
-            setLivroEmEdicao(null);
-          }}
+          onSalvarPorIsbn={handleSalvarPorIsbn}
+          onCancelar={fecharForm}
         />
       )}
 

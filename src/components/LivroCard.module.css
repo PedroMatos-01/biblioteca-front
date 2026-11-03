@@ -1,16 +1,29 @@
-.card {
-  background: #fff;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  padding: 1rem;
+.capa,
+.semCapa {
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  border-radius: 6px;
+  margin-bottom: 0.75rem;
 }
 
-.titulo {
-  margin: 0 0 0.25rem;
-  font-size: 1.1rem;
+.capa {
+  object-fit: cover;
 }
 
-.autor {
-  margin: 0;
+.semCapa {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #e5e7eb;
   color: #6b7280;
+}
+
+.acoes {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.apagar {
+  color: #b91c1c;
 }

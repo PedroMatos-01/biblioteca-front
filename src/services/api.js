@@ -1,55 +1,21 @@
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
+async function requisicao(
+  caminho,
+  { method = "GET", body, autenticado = true, erroPadrao } = {}
+) {
+  const headers = {};
+  if (body) headers["Content-Type"] = "application/json";
 
-const getAuthHeaders = () => {
   const token = localStorage.getItem("token");
-  return token ? { "Content-Type": "application/json", Authorization: `Bearer ${token}` } : { "Content-Type": "application/json" };
-};
+  if (autenticado && token) headers.Authorization = `Bearer ${token}`;
 
-export async function getLivros() {
   let response;
   try {
-    response = await fetch(`${API_URL}/livros`, {
-      headers: getAuthHeaders(),
-    });
-  } catch {
-    throw new Error("Não foi possível conectar ao servidor.");
-  }
-
-  const data = await response.json().catch(() => ({}));
-  if (!response.ok) {
-    throw new Error(data.erro || data.message || "Erro ao carregar livros.");
-  }
-  return data;
-}
-
-export async function login(nome,email, senha) {
-  let response;
-  try {
-    response = await fetch(`${API_URL}/auth`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({nome,email, senha }),
-    });
-  } catch {
-    throw new Error("Não foi possível conectar ao servidor.");
-  }
-
-  const data = await response.json().catch(() => ({}));
-
-  if (!response.ok) {
-    throw new Error(data.erro || data.message || "E-mail ou senha inválidos.");
-  }
-
-  return data;
-}
-export async function cadastrar(nome, email, senha) {
-  let response;
-  try {
-    response = await fetch(`${API_URL}/usuarios`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ nome, email, senha }),
+    response = await fetch(`${API_URL}${caminho}`, {
+      method,
+      headers,
+      body: body ? JSON.stringify(body) : undefined,
     });
   } catch {
     throw new Error("Não foi possível conectar ao servidor.");
@@ -59,40 +25,55 @@ export async function cadastrar(nome, email, senha) {
 
   if (!response.ok) {
     throw new Error(
-      data.erro || data.message || "Não foi possível realizar o cadastro."
+      data.erro || data.message || erroPadrao || "Algo deu errado. Tente novamente."
     );
   }
 
   return data;
 }
 
-
-
-export async function criarLivro(livro) {
-  const response = await fetch(`${API_URL}/livros`, {
+export const login = (nome, email, senha) =>
+  requisicao("/auth", {
     method: "POST",
-    headers: getAuthHeaders(),
-    body: JSON.stringify(livro),
+    body: { nome, email, senha },
+    autenticado: false,
+    erroPadrao: "E-mail ou senha inválidos.",
   });
-  if (!response.ok) throw new Error("Erro ao criar livro.");
-  return await response.json();
-}
 
-export async function editarLivro(id, livro) {
-  const response = await fetch(`${API_URL}/livros/${id}`, {
-    method: "PUT", 
-    headers: getAuthHeaders(),
-    body: JSON.stringify(livro),
+export const cadastrar = (nome, email, senha) =>
+  requisicao("/usuarios", {
+    method: "POST",
+    body: { nome, email, senha },
+    autenticado: false,
+    erroPadrao: "Não foi possível realizar o cadastro.",
   });
-  if (!response.ok) throw new Error("Erro ao editar livro.");
-  return await response.json();
-}
 
-export async function apagarLivro(id) {
-  const response = await fetch(`${API_URL}/livros/${id}`, {
+export const getLivros = () =>
+  requisicao("/livros", { erroPadrao: "Erro ao carregar livros." });
+
+export const criarLivro = (livro) =>
+  requisicao("/livros", {
+    method: "POST",
+    body: livro,
+    erroPadrao: "Erro ao criar livro.",
+  });
+
+export const criarLivroPorIsbn = (isbn) =>
+  requisicao("/livros/isbn", {
+    method: "POST",
+    body: { isbn },
+    erroPadrao: "Não foi possível cadastrar pelo ISBN.",
+  });
+
+export const editarLivro = (id, livro) =>
+  requisicao(`/livros/${id}`, {
+    method: "PUT",
+    body: livro,
+    erroPadrao: "Erro ao editar livro.",
+  });
+
+export const apagarLivro = (id) =>
+  requisicao(`/livros/${id}`, {
     method: "DELETE",
-    headers: getAuthHeaders(),
+    erroPadrao: "Erro ao apagar livro.",
   });
-  if (!response.ok) throw new Error("Erro ao apagar livro.");
-  return true;
-}
