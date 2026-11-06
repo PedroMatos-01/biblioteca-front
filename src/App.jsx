@@ -17,6 +17,7 @@ function App() {
 
   function handleSair() {
     localStorage.removeItem("token");
+    localStorage.removeItem("perfil");
     setToken(null);
   }
 
